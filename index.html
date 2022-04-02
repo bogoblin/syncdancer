@@ -5,10 +5,60 @@
     <title>SyncDancer</title>
 </head>
 <body>
-<video id="main-video" src="./Loop%20Videos/triangle_4.mp4" autoplay muted></video>
+<div id="player"></div>
+
 <script src="./VideoTime.js"></script>
 <script src="./Tapper.js"></script>
-<script src="./index.js"></script>
+<script>
+    const videoTime = new VideoTime(1.867, 1.867, 4);
+    const tapper = new Tapper();
+
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    let player;
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+            height: '390',
+            width: '640',
+            videoId: '8BPq3akHaGI',
+            playerVars: {
+                'playsinline': 1
+            },
+            events: {
+                'onReady': onPlayerReady,
+            }
+        });
+    }
+
+    function onPlayerReady(event) {
+        player.setPlaybackRate(0.001);
+        player.setLoop(true);
+        player.playVideo();
+
+        document.addEventListener('keydown', ev => {
+            const msPerBeat = tapper.tap();
+            const start = tapper.one();
+            videoTime.setStartAndTime(start, msPerBeat);
+            ev.preventDefault();
+            console.log('tap');
+        });
+
+        function doFrame() {
+            requestAnimationFrame((t) => {
+                player.seekTo(videoTime.timeToVideoTime(t), true);
+                player.playVideo();
+                doFrame();
+            });
+        }
+        doFrame();
+    }
+
+</script>
+
+<!--<script src="./index.js"></script>-->
 
 </body>
 </html>

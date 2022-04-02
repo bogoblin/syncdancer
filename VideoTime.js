@@ -1,10 +1,14 @@
 class VideoTime {
     one;
     msPerBeat;
-    video;
+    offset;
+    duration;
+    numberOfBeats;
 
-    constructor(video) {
-        this.video = video;
+    constructor(offset, duration, numberOfBeats) {
+        this.offset = offset;
+        this.duration = duration;
+        this.numberOfBeats = numberOfBeats;
         this.msPerBeat = 500;
         this.one = performance.now();
     }
@@ -15,7 +19,7 @@ class VideoTime {
     }
 
     msPerLoop() {
-        return this.msPerBeat * 4;
+        return this.msPerBeat * this.numberOfBeats;
     }
 
     timeToVideoFraction(time) {
@@ -26,6 +30,6 @@ class VideoTime {
     }
 
     timeToVideoTime(time) {
-        return this.timeToVideoFraction(time) * this.video.duration;
+        return this.offset + this.timeToVideoFraction(time) * this.duration;
     }
 }
