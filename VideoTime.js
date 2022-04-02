@@ -1,16 +1,16 @@
 class VideoTime {
+    video;
     one;
     msPerBeat;
     offset;
-    duration;
     numberOfBeats;
 
-    constructor(offset, duration, numberOfBeats) {
+    constructor(video, offset, numberOfBeats) {
+        this.video = video;
         this.offset = offset;
-        this.duration = duration;
         this.numberOfBeats = numberOfBeats;
         this.msPerBeat = 500;
-        this.one = performance.now();
+        this.one = 0;
     }
 
     setStartAndTime(start, msPerBeat) {
@@ -30,6 +30,10 @@ class VideoTime {
     }
 
     timeToVideoTime(time) {
-        return this.offset + this.timeToVideoFraction(time) * this.duration;
+        return this.offset + this.timeToVideoFraction(time) * this.video.duration;
+    }
+
+    beat(time) {
+        return Math.ceil(this.timeToVideoFraction(time)*this.numberOfBeats);
     }
 }

@@ -8,7 +8,21 @@ class Tapper {
     }
 
     tap() {
-        this.taps[this.currentTap] = performance.now();
+        const now = performance.now();
+        const timeSinceLastTap = now-this.lastTap();
+        const cycleLength = this.averageTimeBetweenTaps()*4;
+        if (timeSinceLastTap > cycleLength) {
+            const cyclesSinceLastTap = Math.floor(timeSinceLastTap/cycleLength);
+            if (cyclesSinceLastTap > 8) {
+                this.currentTap = 0;
+            }
+            const toAdd = cycleLength * cyclesSinceLastTap;
+            for (let i=0; i<this.taps.length; i++) {
+                this.taps[i] += toAdd;
+            }
+        }
+
+        this.taps[this.currentTap] = now;
         this.currentTap += 1;
         if (this.currentTap === this.taps.length) {
             this.currentTap = 0;
@@ -32,5 +46,11 @@ class Tapper {
     averageTimeBetweenTaps() {
         const diff = this.lastTap() - this.firstTap();
         return diff/(this.taps.length-1);
+    }
+
+    multiply(factor) {
+        for (let i=0; i<this.taps.length; i++) {
+            this.taps[i] *= factor;
+        }
     }
 }
