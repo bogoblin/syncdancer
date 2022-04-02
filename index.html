@@ -26,8 +26,8 @@
 
     const tapper = new Tapper();
 
-    document.addEventListener('keydown', () => {
-        tapper.tap();
+    document.addEventListener('keydown', ev => {
+        tapper.tap(ev.timeStamp);
         update();
     });
 
