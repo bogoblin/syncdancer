@@ -6,6 +6,7 @@
 </head>
 <body>
 <div id="player"></div>
+<h1 id="count"></h1>
 
 <script src="./VideoTime.js"></script>
 <script src="./Tapper.js"></script>
@@ -25,19 +26,18 @@
             width: '640',
             videoId: '8BPq3akHaGI',
             playerVars: {
-                'playsinline': 1
+                'color': 'white',
+                'loop': 1,
+                'modestbranding': 1,
             },
             events: {
                 'onReady': onPlayerReady,
             }
         });
+
     }
 
-    function onPlayerReady(event) {
-        player.setPlaybackRate(0.001);
-        player.setLoop(true);
-        player.playVideo();
-
+    function onPlayerReady() {
         document.addEventListener('keydown', ev => {
             const msPerBeat = tapper.tap();
             const start = tapper.one();
@@ -48,7 +48,11 @@
 
         function doFrame() {
             requestAnimationFrame((t) => {
-                player.seekTo(videoTime.timeToVideoTime(t), true);
+                const countText = document.getElementById('count');
+                countText.innerText = Math.ceil(videoTime.timeToVideoFraction(t)*4).toString();
+                player.mute();
+                player.setPlaybackRate(0.25);
+                player.seekTo(videoTime.timeToVideoTime(t), false);
                 player.playVideo();
                 doFrame();
             });
