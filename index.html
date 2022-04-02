@@ -5,10 +5,32 @@
     <title>SyncDancer</title>
 </head>
 <body>
-<video id="main-video" src="./Loop%20Videos/triangle_4.mp4" autoplay muted></video>
+<video id="main-video" src="./Loop%20Videos/triangle_4.mp4" muted></video>
 <script src="./VideoTime.js"></script>
 <script src="./Tapper.js"></script>
-<script src="./index.js"></script>
+<script>
+    const video = document.getElementById('main-video');
+    video.muted = true;
+    video.preservesPitch = false;
+    video.playbackRate = 0;
+
+    const videoTime = new VideoTime(video);
+    const tapper = new Tapper();
+
+    document.addEventListener('keydown', () => {
+        const msPerBeat = tapper.tap();
+        const start = tapper.one();
+        videoTime.setStartAndTime(start, msPerBeat);
+    });
+
+    function doFrame() {
+        requestAnimationFrame((t) => {
+            video.fastSeek(videoTime.timeToVideoTime(t));
+            doFrame();
+        });
+    }
+    doFrame();
+</script>
 
 </body>
 </html>
