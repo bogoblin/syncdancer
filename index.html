@@ -14,7 +14,7 @@
     video.preservesPitch = false;
     video.playbackRate = 0;
 
-    const videoTime = new VideoTime(video);
+    const videoTime = new VideoTime(0, video.duration, 4);
     const tapper = new Tapper();
 
     document.addEventListener('keydown', () => {
@@ -25,7 +25,7 @@
 
     function doFrame() {
         requestAnimationFrame((t) => {
-            video.fastSeek(videoTime.timeToVideoTime(t));
+            video.currentTime = videoTime.timeToVideoTime(t);
             doFrame();
         });
     }
