@@ -13,6 +13,7 @@ class Tapper {
         if (this.currentTap === this.taps.length) {
             this.currentTap = 0;
         }
+        return this.averageTimeBetweenTaps();
     }
 
     lastTap() {
@@ -22,6 +23,10 @@ class Tapper {
 
     firstTap() {
         return this.taps[this.currentTap];
+    }
+
+    one() {
+        return this.taps[0];
     }
 
     averageTimeBetweenTaps() {
