@@ -5,6 +5,9 @@ class DanceCanvas {
     mode;
     toDraw;
 
+    tileWidth;
+    tileHeight;
+
     constructor() {
         this.canvas = document.createElement("canvas");
         this.canvas.width = window.innerWidth;
@@ -20,6 +23,9 @@ class DanceCanvas {
         this.toDraw = [];
 
         this.mode = "TILE";
+
+        this.tileWidth = 200;
+        this.tileHeight = 200;
     }
 
     addGif(name, gif) {
@@ -27,6 +33,13 @@ class DanceCanvas {
     }
 
     draw() {
+        if (this.tileWidth <= 0) {
+            this.tileWidth = 200;
+        }
+        if (this.tileHeight <= 0) {
+            this.tileHeight = 200;
+        }
+
         if (this.toDraw.length === 0) return;
 
         let i = 0;
@@ -36,11 +49,11 @@ class DanceCanvas {
         const ctx = this.canvas.getContext("2d");
         switch (this.mode) {
             case "TILE":
-                for (let x = 0; x < this.canvas.width; x += 200) {
-                    for (let y = 0; y < this.canvas.height; y += 200) {
+                for (let x = 0; x < this.canvas.width; x += this.tileWidth) {
+                    for (let y = 0; y < this.canvas.height; y += this.tileHeight) {
                         let g = this.gifs[this.toDraw[i]];
                         if (!g) continue;
-                        ctx.drawImage(g, x, y, 200, 200);
+                        ctx.drawImage(g, x, y, this.tileWidth, this.tileHeight);
                         i+=1;
                         i %= this.toDraw.length;
                     }
