@@ -15,44 +15,37 @@
     const video = document.getElementById('main-video');
     const count = document.getElementById('count');
 
-    let videoTime;
+    const tapper = new Tapper();
+
+    let videos = [];
     video.onloadeddata = () => {
-        videoTime = new VideoTime(video, 0, 4);
+        videos.push(new VideoTime(video, 0, video.duration, 4));
         video.muted = true;
         video.preservesPitch = false;
         video.playbackRate = 0;
-        doFrame();
     }
-
-    const tapper = new Tapper();
 
     document.addEventListener('keydown', ev => {
         tapper.tap(ev.timeStamp);
-        update();
     });
-
-    function doFrame() {
-        requestAnimationFrame((t) => {
-            doFrame();
-            video.currentTime = videoTime.timeToVideoTime(t);
-            count.innerText = `${videoTime.beat(t)}`;
-        });
-    }
 
     function doubleTime() {
         tapper.multiply(0.5);
-        update();
     }
     function halfTime() {
         tapper.multiply(2);
-        update();
     }
 
-    function update() {
-        const start = tapper.one();
-        const msPerBeat = tapper.averageTimeBetweenTaps();
-        videoTime.setStartAndTime(start, msPerBeat);
+    function update(time) {
+        const nextBeat = tapper.whenNextBeat(time);
+        for (let v of videos) {
+            v.update(time, nextBeat);
+            count.innerText = v.beat();
+        }
+        requestAnimationFrame(update);
     }
+
+    requestAnimationFrame(update);
 </script>
 
 </body>

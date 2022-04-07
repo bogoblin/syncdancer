@@ -1,55 +1,56 @@
 class Tapper {
     taps;
-    currentTap;
+    nextTap;
+
+    msPerBeat;
+    lastBeat;
+    nextBeat;
 
     constructor() {
-        this.taps = [0, 500, 1000, 1500];
-        this.currentTap = 0;
+        this.resetTaps();
+
+        this.msPerBeat = 500;
+        this.lastBeat = performance.now();
+        this.whenNextBeat(this.lastBeat);
+    }
+
+    whenNextBeat(time) {
+        this.nextBeat = this.lastBeat + this.msPerBeat;
+        if (time > this.nextBeat) {
+            this.lastBeat += this.msPerBeat;
+            this.nextBeat = this.lastBeat + this.msPerBeat;
+        }
+        if (time > this.nextBeat) {
+            this.lastBeat = time;
+            return this.whenNextBeat(time);
+        }
+        return this.nextBeat;
+    }
+
+    resetTaps() {
+        this.taps = [0, 0, 0, 0];
+        this.nextTap = 0;
     }
 
     tap(time) {
-        const timeSinceLastTap = time-this.lastTap();
-        const cycleLength = this.averageTimeBetweenTaps()*4;
-        if (timeSinceLastTap > cycleLength) {
-            const cyclesSinceLastTap = Math.floor(timeSinceLastTap/cycleLength);
-            if (cyclesSinceLastTap > 8) {
-                this.currentTap = 0;
-            }
-            const toAdd = cycleLength * cyclesSinceLastTap;
-            for (let i=0; i<this.taps.length; i++) {
-                this.taps[i] += toAdd;
-            }
-        }
+        const timeSinceLastTap = time - this.lastTap();
+        if (timeSinceLastTap > 2000) this.resetTaps();
 
-        this.taps[this.currentTap] = time;
-        this.currentTap += 1;
-        if (this.currentTap === this.taps.length) {
-            this.currentTap = 0;
+        this.taps[this.nextTap] = time;
+        this.nextTap+=1;
+        if (this.nextTap === this.taps.length) {
+            this.msPerBeat = (this.lastTap() - this.taps[0])/(this.taps.length-1);
+            this.lastBeat = time;
+            this.resetTaps();
         }
-        return this.averageTimeBetweenTaps();
     }
 
     lastTap() {
-        const n = this.taps.length;
-        return this.taps[(this.currentTap-1+n)%n];
-    }
-
-    firstTap() {
-        return this.taps[this.currentTap];
-    }
-
-    one() {
-        return this.taps[0];
-    }
-
-    averageTimeBetweenTaps() {
-        const diff = this.lastTap() - this.firstTap();
-        return diff/(this.taps.length-1);
+        if (this.nextTap === 0) return 0;
+        return this.taps[this.nextTap-1];
     }
 
     multiply(factor) {
-        for (let i=0; i<this.taps.length; i++) {
-            this.taps[i] *= factor;
-        }
+        this.msPerBeat *= factor;
     }
 }
