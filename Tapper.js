@@ -1,6 +1,5 @@
 class Tapper {
     taps;
-    nextTap;
 
     msPerBeat;
     lastBeat;
@@ -11,6 +10,7 @@ class Tapper {
 
         this.msPerBeat = 500;
         this.lastBeat = performance.now();
+        this.nextBeat = this.lastBeat+this.msPerBeat;
         this.whenNextBeat(this.lastBeat);
     }
 
@@ -28,29 +28,37 @@ class Tapper {
     }
 
     resetTaps() {
-        this.taps = [0, 0, 0, 0];
-        this.nextTap = 0;
+        this.taps = [];
     }
 
     tap(time) {
+        if (this.taps.length === 0) {
+            this.taps.push(time);
+            return;
+        }
+
         const timeSinceLastTap = time - this.lastTap();
         if (timeSinceLastTap > 2000) this.resetTaps();
 
-        this.taps[this.nextTap] = time;
-        this.nextTap+=1;
-        if (this.nextTap === this.taps.length) {
+        this.taps.push(time);
+        if (this.taps.length >= 4) {
             this.msPerBeat = (this.lastTap() - this.taps[0])/(this.taps.length-1);
             this.lastBeat = time;
-            this.resetTaps();
         }
     }
 
     lastTap() {
-        if (this.nextTap === 0) return 0;
-        return this.taps[this.nextTap-1];
+        if (this.taps.length === 0)
+            return 0;
+
+        return this.taps[this.taps.length-1];
     }
 
     multiply(factor) {
         this.msPerBeat *= factor;
+    }
+
+    bpm() {
+        return (60*1000/this.msPerBeat).toFixed(2);
     }
 }

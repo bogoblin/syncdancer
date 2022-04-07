@@ -39,8 +39,8 @@
     function update(time) {
         const nextBeat = tapper.whenNextBeat(time);
         for (let v of videos) {
-            v.update(time, nextBeat);
-            count.innerText = v.beat();
+            v.update(time, tapper.lastBeat, nextBeat);
+            count.innerText = `${tapper.bpm()}BPM`;
         }
         requestAnimationFrame(update);
     }

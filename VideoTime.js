@@ -17,23 +17,16 @@ class VideoTime {
         this.lastUpdate = 0;
     }
 
-    update(time, nextBeat) {
+    update(time, lastBeat, nextBeat) {
         if (this.lastUpdate === 0)
             this.lastUpdate = time;
 
-        const timeDiff = time - this.lastUpdate;
-        this.lastUpdate = time;
-
-        const timeUntilNextBeat = nextBeat - time;
-        const fractionUntilNextBeat = this.nextBeatFraction() - this.fraction;
-
-        // console.log({
-        //     fractionUntilNextBeat,
-        //     timeUntilNextBeat,
-        //     timeDiff
-        // });
-        const fracDiff = timeDiff*(fractionUntilNextBeat/timeUntilNextBeat);
-        this.fraction += fracDiff;
+        const fractionThroughBeat = (time-lastBeat)/(nextBeat-lastBeat);
+        let newFraction = fractionThroughBeat * this.fractionPerBeat();
+        while(newFraction < this.fraction) {
+            newFraction += this.fractionPerBeat();
+        }
+        this.fraction = newFraction;
         if (this.fraction > 1)
             this.fraction -= Math.floor(this.fraction);
 
@@ -44,7 +37,7 @@ class VideoTime {
         return this.beat()/this.numberOfBeats;
     }
 
-    beat() {
-        return Math.floor(this.fraction*this.numberOfBeats) + 1;
+    fractionPerBeat() {
+        return 1/this.numberOfBeats;
     }
 }
