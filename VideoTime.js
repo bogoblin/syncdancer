@@ -6,8 +6,9 @@ class VideoTime {
 
     fraction;
     lastUpdate;
+    onUpdate;
 
-    constructor(video, offset, loopLength, numberOfBeats) {
+    constructor(video, offset, loopLength, numberOfBeats, onUpdate) {
         this.video = video;
         this.offset = offset;
         this.loopLength = loopLength;
@@ -15,6 +16,8 @@ class VideoTime {
 
         this.fraction = 0;
         this.lastUpdate = 0;
+
+        this.onUpdate = onUpdate;
     }
 
     update(time, lastBeat, nextBeat) {
@@ -30,7 +33,7 @@ class VideoTime {
         if (this.fraction > 1)
             this.fraction -= Math.floor(this.fraction);
 
-        this.video.currentTime = this.offset + this.fraction * this.loopLength;
+        this.onUpdate(this);
     }
 
     nextBeatFraction() {

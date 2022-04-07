@@ -5,25 +5,38 @@
     <title>SyncDancer</title>
 </head>
 <body style="margin: 0; height: 100%; width: 100%">
-<video style="width: 100%" id="main-video" src="./Loop%20Videos/triangle_4.mp4" muted></video>
 <h1 id="count">1</h1>
 <button onclick="doubleTime()">Double Time!</button>
 <button onclick="halfTime()">Half Time!</button>
 <script src="./VideoTime.js"></script>
 <script src="./Tapper.js"></script>
+<script src="./libgif.js"></script>
 <script>
-    const video = document.getElementById('main-video');
+    let videos = [];
+
+    function loadGif(url) {
+        const element = document.createElement('img');
+        document.body.append(element);
+        const beats = url.split('_').pop().split('.')[0];
+        element.src = url;
+        const sg = new SuperGif({gif: element});
+        sg.load(() => {
+            sg.pause();
+
+            videos.push(new VideoTime(element, 11, sg.get_length(), beats, vT => {
+                const frame = (vT.offset + vT.fraction * vT.loopLength) % sg.get_length();
+                sg.move_to(frame);
+            }));
+        });
+
+        return element;
+    }
+    loadGif('./Loop%20Videos/triangle_4.gif');
+    loadGif('./Loop%20Videos/duck_32.gif');
+
     const count = document.getElementById('count');
 
     const tapper = new Tapper();
-
-    let videos = [];
-    video.onloadeddata = () => {
-        videos.push(new VideoTime(video, 0, video.duration, 4));
-        video.muted = true;
-        video.preservesPitch = false;
-        video.playbackRate = 0;
-    }
 
     document.addEventListener('keydown', ev => {
         tapper.tap(ev.timeStamp);
