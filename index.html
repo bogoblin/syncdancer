@@ -4,37 +4,48 @@
     <meta charset="UTF-8">
     <title>SyncDancer</title>
 </head>
-<body style="margin: 0; height: 100%; width: 100%">
-<h1 id="count">1</h1>
-<button onclick="doubleTime()">Double Time!</button>
-<button onclick="halfTime()">Half Time!</button>
+<body style="margin: 0; height: 100%; width: 100%; overflow: hidden">
 <script src="./VideoTime.js"></script>
 <script src="./Tapper.js"></script>
+<script src="./DanceCanvas.js"></script>
 <script src="./libgif.js"></script>
 <script>
+    const gifs = {
+        "duck": {
+            url: './Loop%20Videos/duck_32.gif',
+            offset: 11,
+            beats: 32,
+        },
+        "triangle": {
+            url: './Loop%20Videos/triangle_4.gif',
+            offset: 0,
+            beats: 4,
+        }
+    };
+</script>
+<script>
     let videos = [];
+    const dance = new DanceCanvas();
 
-    function loadGif(url) {
+    for (let gifName in gifs) {
+        const g = gifs[gifName];
         const element = document.createElement('img');
         document.body.append(element);
-        const beats = url.split('_').pop().split('.')[0];
-        element.src = url;
+        element.src = g.url;
         const sg = new SuperGif({gif: element});
         sg.load(() => {
             sg.pause();
 
-            videos.push(new VideoTime(element, 11, sg.get_length(), beats, vT => {
+            videos.push(new VideoTime(element, g.offset, sg.get_length(), g.beats, vT => {
                 const frame = (vT.offset + vT.fraction * vT.loopLength) % sg.get_length();
                 sg.move_to(frame);
             }));
+            dance.addGif(gifName, sg.get_canvas());
         });
-
-        return element;
+        sg.get_canvas().hidden = true;
     }
-    loadGif('./Loop%20Videos/triangle_4.gif');
-    loadGif('./Loop%20Videos/duck_32.gif');
-
-    const count = document.getElementById('count');
+    dance.mode = "TILE";
+    dance.toDraw = ["duck", "triangle"];
 
     const tapper = new Tapper();
 
@@ -53,8 +64,8 @@
         const nextBeat = tapper.whenNextBeat(time);
         for (let v of videos) {
             v.update(time, tapper.lastBeat, nextBeat);
-            count.innerText = `${tapper.bpm()}BPM`;
         }
+        dance.draw();
         requestAnimationFrame(update);
     }
 
