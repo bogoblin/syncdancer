@@ -31,6 +31,16 @@ class DanceCanvas {
     addGif(name, gif) {
         this.gifs[name] = gif;
     }
+    
+    tile(names) {
+        this.mode = "TILE";
+        this.toDraw = names;
+    }
+    
+    fill(name) {
+        this.mode = "FILL";
+        this.toDraw = [name];
+    }
 
     draw() {
         if (this.tileWidth <= 0) {
